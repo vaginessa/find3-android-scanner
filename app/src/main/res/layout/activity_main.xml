@@ -11,187 +11,196 @@
         android:layout_height="match_parent"
         android:fillViewport="true">
 
-    <TableLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:stretchColumns="1">
-
-        <ImageView
-            android:id="@+id/imageView"
-            android:layout_width="113dp"
-            android:layout_height="105dp"
-            android:adjustViewBounds="true"
-            android:paddingBottom="16dp"
-            android:paddingTop="16dp"
-            android:scaleType="fitCenter"
-            android:contentDescription="@string/image"
-            app:srcCompat="@drawable/ic_find3_01" />
-
-        <LinearLayout
-        android:id="@+id/relLayout6"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:orientation="horizontal">
-        <EditText
-            android:id="@+id/familyName"
-            android:layout_width="220dp"
+        <TableLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:ems="10"
-            android:gravity="center"
-            android:inputType="textPersonName"
-            android:hint="@+id/familyLabel"
-            android:paddingTop="-10dp" />
+            android:stretchColumns="1">
 
-            <TextView
-                android:id="@+id/familyLabel"
-                android:layout_width="80dp"
+            <ImageView
+                android:id="@+id/imageView"
+                android:layout_width="113dp"
+                android:layout_height="105dp"
+                android:adjustViewBounds="true"
+                android:contentDescription="@string/image"
+                android:paddingTop="16dp"
+                android:paddingBottom="16dp"
+                android:scaleType="fitCenter"
+                app:srcCompat="@drawable/ic_find3_01" />
+
+            <LinearLayout
+                android:id="@+id/relLayout6"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/family" />
-    </LinearLayout>
+                android:gravity="center"
+                android:orientation="horizontal">
 
-        <LinearLayout
-        android:id="@+id/relLayout5"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:orientation="horizontal">
-        <EditText
-            android:id="@+id/deviceName"
-            android:layout_width="220dp"
-            android:layout_height="wrap_content"
-            android:ems="10"
-            android:gravity="center"
-            android:hint="@+id/deviceLabel"
-            android:inputType="textUri|textPersonName" />
+                <EditText
+                    android:id="@+id/familyName"
+                    android:layout_width="220dp"
+                    android:layout_height="wrap_content"
+                    android:ems="10"
+                    android:gravity="center"
+                    android:hint="@+id/familyLabel"
+                    android:inputType="textPersonName"
+                    android:paddingTop="-10dp" />
 
-            <TextView
+                <TextView
+                    android:id="@+id/familyLabel"
+                    android:layout_width="80dp"
+                    android:layout_height="wrap_content"
+                    android:text="@string/family" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/relLayout5"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:orientation="horizontal">
+
+                <EditText
+                    android:id="@+id/deviceName"
+                    android:layout_width="220dp"
+                    android:layout_height="wrap_content"
+                    android:ems="10"
+                    android:gravity="center"
+                    android:hint="@+id/deviceLabel"
+                    android:inputType="textUri|textPersonName" />
+
+                <TextView
                 android:id="@+id/deviceLabel"
                 android:layout_width="80dp"
                 android:layout_height="wrap_content"
                 android:text="@string/device" />
-    </LinearLayout>
 
-        <LinearLayout
-        android:id="@+id/relLayout4"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:orientation="horizontal">
+            </LinearLayout>
 
-        <EditText
-            android:id="@+id/serverAddress"
-            android:layout_width="220dp"
-            android:layout_height="wrap_content"
-            android:ems="10"
-            android:gravity="center"
-            android:inputType="textUri|textPersonName"
-            android:hint="@+id/serverLabel"
-            android:text="@string/default_server"
-            android:textSize="12sp" />
-
-            <TextView
-                android:id="@+id/serverLabel"
-                android:layout_width="80dp"
-                android:layout_height="wrap_content"
-                android:text="@string/server" />
-
-    </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/relLayout3"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:orientation="horizontal">
-
-            <AutoCompleteTextView
-                android:id="@+id/locationName"
-                android:layout_width="220dp"
-                android:layout_height="wrap_content"
-                android:ems="10"
-                android:gravity="center"
-                android:hint="@+id/locationLabel"
-                android:inputType="textUri|textPersonName" />
-
-            <TextView
-                android:id="@+id/locationLabel"
-                android:layout_width="80dp"
-                android:layout_height="wrap_content"
-                android:text="@string/location" />
-        </LinearLayout>
-
-        <LinearLayout
-        android:id="@+id/relLayout7"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:paddingTop="10dp"
-        android:orientation="horizontal">
-
-        <CheckBox
-            android:id="@+id/allowGPS"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:text="@string/gps" />
-    </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/relLayout2"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:paddingTop="10dp"
-            android:orientation="horizontal">
-
-            <ToggleButton
-                android:id="@+id/toggleScanType"
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:id="@+id/relLayout4"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center"
-                android:text="@string/toggle_button"
-                android:textOff="@string/tracking"
-                android:textOn="@string/learning" />
+                android:orientation="horizontal">
 
-            <ToggleButton
-                android:id="@+id/toggleButton"
-                android:layout_width="wrap_content"
+                <EditText
+                    android:id="@+id/serverAddress"
+                    android:layout_width="220dp"
+                    android:layout_height="wrap_content"
+                    android:ems="10"
+                    android:gravity="center"
+                    android:hint="@+id/serverLabel"
+                    android:inputType="textUri|textPersonName"
+                    android:text="@string/default_server"
+                    android:textSize="12sp" />
+
+                <TextView
+                    android:id="@+id/serverLabel"
+                    android:layout_width="80dp"
+                    android:layout_height="wrap_content"
+                    android:text="@string/server" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/relLayout3"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center"
-                android:text="@string/toggle_button"
-                android:textOff="@string/start_scan"
-                android:textOn="@string/stop_scan" />
-        </LinearLayout>
+                android:orientation="horizontal">
 
-        <LinearLayout
-            android:id="@+id/relLayout12"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:orientation="vertical"
-            android:paddingBottom="10dp"
-            android:paddingTop="10dp">
+                <AutoCompleteTextView
+                    android:id="@+id/locationName"
+                    android:layout_width="220dp"
+                    android:layout_height="wrap_content"
+                    android:ems="10"
+                    android:gravity="center"
+                    android:hint="@+id/locationLabel"
+                    android:inputType="textUri|textPersonName" />
+
+                <TextView
+                    android:id="@+id/locationLabel"
+                    android:layout_width="80dp"
+                    android:layout_height="wrap_content"
+                    android:text="@string/location" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/relLayout7"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:orientation="horizontal"
+                android:paddingTop="10dp">
+
+                <CheckBox
+                    android:id="@+id/allowGPS"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:text="@string/gps" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/relLayout2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:orientation="horizontal"
+                android:paddingTop="10dp">
+
+                <ToggleButton
+                    android:id="@+id/toggleScanType"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:text="@string/toggle_button"
+                    android:textOff="@string/tracking"
+                    android:textOn="@string/learning" />
+
+                <ToggleButton
+                    android:id="@+id/toggleButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:text="@string/toggle_button"
+                    android:textOff="@string/start_scan"
+                    android:textOn="@string/stop_scan" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/relLayout12"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:paddingTop="10dp"
+                android:paddingBottom="10dp">
+
+                <TextView
+                    android:id="@+id/textOutput"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingLeft="24dp"
+                    android:paddingRight="24dp" />
+
+            </LinearLayout>
 
             <TextView
-                android:id="@+id/textOutput"
+                android:id="@+id/textInstructions"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
                 android:paddingLeft="24dp"
+                android:paddingTop="4dp"
                 android:paddingRight="24dp"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
+                android:paddingBottom="16dp"
+                android:text="@string/instructions" />
 
-        </LinearLayout>
+        </TableLayout>
 
-        <TextView
-            android:id="@+id/textInstructions"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:paddingBottom="16dp"
-            android:paddingLeft="24dp"
-            android:paddingRight="24dp"
-            android:paddingTop="4dp"
-            android:text="@string/instructions" />
-
-    </TableLayout>
     </ScrollView>
+
 </android.support.constraint.ConstraintLayout>
