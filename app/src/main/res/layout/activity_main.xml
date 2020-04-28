@@ -34,6 +34,12 @@
                 android:gravity="center"
                 android:orientation="horizontal">
 
+                <TextView
+                    android:id="@+id/familyLabel"
+                    android:layout_width="80dp"
+                    android:layout_height="wrap_content"
+                    android:text="@string/family" />
+
                 <EditText
                     android:id="@+id/familyName"
                     android:layout_width="220dp"
@@ -44,12 +50,6 @@
                     android:inputType="textPersonName"
                     android:paddingTop="-10dp" />
 
-                <TextView
-                    android:id="@+id/familyLabel"
-                    android:layout_width="80dp"
-                    android:layout_height="wrap_content"
-                    android:text="@string/family" />
-
             </LinearLayout>
 
             <LinearLayout
@@ -58,6 +58,12 @@
                 android:layout_height="wrap_content"
                 android:gravity="center"
                 android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/deviceLabel"
+                    android:layout_width="80dp"
+                    android:layout_height="wrap_content"
+                    android:text="@string/device" />
 
                 <EditText
                     android:id="@+id/deviceName"
@@ -68,12 +74,6 @@
                     android:hint="@+id/deviceLabel"
                     android:inputType="textUri|textPersonName" />
 
-                <TextView
-                android:id="@+id/deviceLabel"
-                android:layout_width="80dp"
-                android:layout_height="wrap_content"
-                android:text="@string/device" />
-
             </LinearLayout>
 
             <LinearLayout
@@ -82,6 +82,12 @@
                 android:layout_height="wrap_content"
                 android:gravity="center"
                 android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/serverLabel"
+                    android:layout_width="80dp"
+                    android:layout_height="wrap_content"
+                    android:text="@string/server" />
 
                 <EditText
                     android:id="@+id/serverAddress"
@@ -94,12 +100,6 @@
                     android:text="@string/default_server"
                     android:textSize="12sp" />
 
-                <TextView
-                    android:id="@+id/serverLabel"
-                    android:layout_width="80dp"
-                    android:layout_height="wrap_content"
-                    android:text="@string/server" />
-
             </LinearLayout>
 
             <LinearLayout
@@ -109,6 +109,12 @@
                 android:gravity="center"
                 android:orientation="horizontal">
 
+                <TextView
+                    android:id="@+id/locationLabel"
+                    android:layout_width="80dp"
+                    android:layout_height="wrap_content"
+                    android:text="@string/location" />
+
                 <AutoCompleteTextView
                     android:id="@+id/locationName"
                     android:layout_width="220dp"
@@ -117,12 +123,6 @@
                     android:gravity="center"
                     android:hint="@+id/locationLabel"
                     android:inputType="textUri|textPersonName" />
-
-                <TextView
-                    android:id="@+id/locationLabel"
-                    android:layout_width="80dp"
-                    android:layout_height="wrap_content"
-                    android:text="@string/location" />
 
             </LinearLayout>
 
