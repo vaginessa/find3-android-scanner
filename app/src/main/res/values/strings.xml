@@ -1,3 +1,11 @@
 <resources>
     <string name="app_name">FIND3 Scanner</string>
+    <string name="no_family">family name cannot be empty</string>
+    <string name="no_server">server address cannot be empty</string>
+    <string name="no_valid_server">must include http or https in server name</string>
+    <string name="no_device">device name cannot be empty</string>
+    <string name="no_location">location name cannot be empty when learning</string>
+    <string name="running">running</string>
+    <string name="not_running">not running</string>
+    <string name="web_socket_error">cannot connect to server, fingerprints will not be uploaded</string>
 </resources>

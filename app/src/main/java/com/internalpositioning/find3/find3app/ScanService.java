@@ -1,8 +1,5 @@
 package com.internalpositioning.find3.find3app;
 
-import android.app.Activity;
-import android.app.Notification;
-import android.app.PendingIntent;
 import android.app.Service;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
@@ -16,16 +13,12 @@ import android.net.wifi.ScanResult;
 import android.net.wifi.WifiManager;
 import android.os.IBinder;
 import android.util.Log;
-import android.widget.EditText;
-import android.widget.TextView;
 
-import com.android.volley.AuthFailureError;
 import com.android.volley.NetworkResponse;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
-import com.android.volley.VolleyLog;
 import com.android.volley.toolbox.HttpHeaderParser;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
@@ -33,8 +26,10 @@ import com.android.volley.toolbox.Volley;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 /**
  * Created by zacks on 3/2/2018.
@@ -44,8 +39,6 @@ public class ScanService extends Service {
     // logging
     private final String TAG = "ScanService";
 
-    int mStartMode;       // indicates how to behave if the service is killed
-    IBinder mBinder;      // interface for clients that bind
     boolean mAllowRebind; // indicates whether onRebind should be used
 
     boolean isScanning = false;
@@ -69,6 +62,36 @@ public class ScanService extends Service {
     private String deviceName = "";
     private String serverAddress = "";
     private boolean allowGPS = false;
+    private boolean isLearningMode = false;
+    private final BroadcastReceiver mWifiScanReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context c, Intent intent) {
+            // This condition is not necessary if you listen to only one action
+            if (intent.getBooleanExtra(WifiManager.EXTRA_RESULTS_UPDATED, false)) {
+                Log.d(TAG, "timer off, trying to send data");
+                List<ScanResult> wifiScanList = wifi.getScanResults();
+                for (int i = 0; i < wifiScanList.size(); i++) {
+                    String name = wifiScanList.get(i).BSSID.toLowerCase();
+                    int rssi = wifiScanList.get(i).level;
+                    Log.v(TAG, "wifi: " + name + " => " + rssi + "dBm");
+                    try {
+                        wifiResults.put(name, rssi);
+                    } catch (Exception e) {
+                        Log.e(TAG, e.toString());
+                    }
+                }
+                sendData();
+                BTAdapter.cancelDiscovery();
+                BTAdapter = BluetoothAdapter.getDefaultAdapter();
+                synchronized (lock) {
+                    isScanning = false;
+                }
+                if (!isLearningMode) {
+                    doScan(); // track as often as possible
+                }
+            }
+        }
+    };
 
     @Override
     public void onCreate() {
@@ -77,7 +100,8 @@ public class ScanService extends Service {
         queue = Volley.newRequestQueue(this);
         // setup wifi
         wifi = (WifiManager) this.getSystemService(Context.WIFI_SERVICE);
-        if (wifi.isWifiEnabled() == false) {
+        assert wifi != null;
+        if (!wifi.isWifiEnabled()) {
             wifi.setWifiEnabled(true);
         }
         // register wifi intent filter
@@ -95,91 +119,6 @@ public class ScanService extends Service {
         } catch (Exception e) {
             Log.e(TAG, e.toString());
         }
-    }
-
-
-    @Override
-    public int onStartCommand(Intent intent, int flags, int startId) {
-        super.onStartCommand(intent, flags, startId);
-        deviceName = intent.getStringExtra("deviceName");
-        familyName = intent.getStringExtra("familyName");
-        locationName = intent.getStringExtra("locationName");
-        serverAddress = intent.getStringExtra("serverAddress");
-        allowGPS = intent.getBooleanExtra("allowGPS", false);
-
-        Log.d(TAG, "familyName: " + familyName);
-
-        new java.util.Timer().schedule(
-                new java.util.TimerTask() {
-                    @Override
-                    public void run() {
-                        synchronized (lock) {
-                            if (isScanning == false) {
-                                doScan();
-                            }
-                        }
-                    }
-                },
-                0
-        );
-
-
-        new java.util.Timer().schedule(
-                new java.util.TimerTask() {
-                    @Override
-                    public void run() {
-                        synchronized (lock) {
-                            if (isScanning == false) {
-                                doScan();
-                            }
-                        }
-                    }
-                },
-                10000
-        );
-
-        new java.util.Timer().schedule(
-                new java.util.TimerTask() {
-                    @Override
-                    public void run() {
-                        synchronized (lock) {
-                            if (isScanning == false) {
-                                doScan();
-                            }
-                        }
-                    }
-                },
-                20000
-        );
-        new java.util.Timer().schedule(
-                new java.util.TimerTask() {
-                    @Override
-                    public void run() {
-                        synchronized (lock) {
-                            if (isScanning == false) {
-                                doScan();
-                            }
-                        }
-                    }
-                },
-                30000
-        );
-        new java.util.Timer().schedule(
-                new java.util.TimerTask() {
-                    @Override
-                    public void run() {
-                        synchronized (lock) {
-                            if (isScanning == false) {
-                                doScan();
-                            }
-                        }
-                        stopSelf(); // stop the service
-                    }
-                },
-                40000
-        );
-
-        return START_STICKY;
     }
 
     @Override
@@ -201,6 +140,38 @@ public class ScanService extends Service {
     }
 
     @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        super.onStartCommand(intent, flags, startId);
+        deviceName = intent.getStringExtra("deviceName");
+        familyName = intent.getStringExtra("familyName");
+        locationName = intent.getStringExtra("locationName");
+        serverAddress = intent.getStringExtra("serverAddress");
+        allowGPS = intent.getBooleanExtra("allowGPS", false);
+
+        Log.d(TAG, "familyName: " + familyName);
+
+        isLearningMode = !locationName.isEmpty();
+
+        if (isLearningMode) {
+            new Timer().scheduleAtFixedRate(new TimerTask() {
+                @Override
+                public void run() {
+                    //your method
+                    synchronized (lock) {
+                        if (!isScanning) {
+                            doScan();
+                        }
+                    }
+                }
+            }, 0, 10000);//put here time 10000 milliseconds=10 second
+        } else {
+            doScan();
+        }
+
+        return START_STICKY;
+    }
+
+    @Override
     public void onDestroy() {
         // The service is no longer used and is being destroyed
         Log.v(TAG, "onDestroy");
@@ -211,8 +182,7 @@ public class ScanService extends Service {
             Log.w(TAG, e.toString());
         }
         try {
-            if (mWifiScanReceiver != null)
-                unregisterReceiver(mWifiScanReceiver);
+            unregisterReceiver(mWifiScanReceiver);
         } catch (Exception e) {
             Log.w(TAG, e.toString());
         }
@@ -221,36 +191,9 @@ public class ScanService extends Service {
 
     }
 
-    private final BroadcastReceiver mWifiScanReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context c, Intent intent) {
-            // This condition is not necessary if you listen to only one action
-            if (intent.getAction().equals(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION)) {
-                Log.d(TAG, "timer off, trying to send data");
-                List<ScanResult> wifiScanList = wifi.getScanResults();
-                for (int i = 0; i < wifiScanList.size(); i++) {
-                    String name = wifiScanList.get(i).BSSID.toLowerCase();
-                    int rssi = wifiScanList.get(i).level;
-                    Log.v(TAG, "wifi: " + name + " => " + rssi + "dBm");
-                    try {
-                        wifiResults.put(name, rssi);
-                    } catch (Exception e) {
-                        Log.e(TAG, e.toString());
-                    }
-                }
-                sendData();
-                BTAdapter.cancelDiscovery();
-                BTAdapter = BluetoothAdapter.getDefaultAdapter();
-                synchronized (lock) {
-                    isScanning = false;
-                }
-            }
-        }
-    };
-
     private void doScan() {
         synchronized (lock) {
-            if (isScanning == true) {
+            if (isScanning) {
                 return;
             }
             isScanning = true;
@@ -285,9 +228,6 @@ public class ScanService extends Service {
         }
     }
 
-    ;
-
-
     public void sendData() {
         try {
             String URL = serverAddress + "/data";
@@ -302,12 +242,10 @@ public class ScanService extends Service {
             if (allowGPS) {
                 JSONObject gps = new JSONObject();
                 Location loc = getLastBestLocation();
-                if (loc != null) {
-                    gps.put("lat",loc.getLatitude());
-                    gps.put("lon",loc.getLongitude());
-                    gps.put("alt",loc.getAltitude());
-                    jsonBody.put("gps",gps);
-                }
+                gps.put("lat", loc.getLatitude());
+                gps.put("lon", loc.getLongitude());
+                gps.put("alt", loc.getAltitude());
+                jsonBody.put("gps", gps);
             }
 
             final String mRequestBody = jsonBody.toString();
@@ -330,13 +268,8 @@ public class ScanService extends Service {
                 }
 
                 @Override
-                public byte[] getBody() throws AuthFailureError {
-                    try {
-                        return mRequestBody == null ? null : mRequestBody.getBytes("utf-8");
-                    } catch (UnsupportedEncodingException uee) {
-                        VolleyLog.wtf("Unsupported Encoding while trying to get the bytes of %s using %s", mRequestBody, "utf-8");
-                        return null;
-                    }
+                public byte[] getBody() {
+                    return mRequestBody == null ? null : mRequestBody.getBytes(StandardCharsets.UTF_8);
                 }
 
                 @Override
@@ -345,6 +278,7 @@ public class ScanService extends Service {
                     if (response != null) {
                         responseString = new String(response.data);
                     }
+                    assert response != null;
                     return Response.success(responseString, HttpHeaderParser.parseCacheHeaders(response));
                 }
             };
@@ -362,6 +296,7 @@ public class ScanService extends Service {
         LocationManager mLocationManager = (LocationManager)
                 getSystemService(Context.LOCATION_SERVICE);
 
+        assert mLocationManager != null;
         Location locationGPS = mLocationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
         Location locationNet = mLocationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
 
@@ -378,10 +313,12 @@ public class ScanService extends Service {
         }
 
         if (0 < GPSLocationTime - NetLocationTime) {
-            Log.d("GPS",locationGPS.toString());
+            assert locationGPS != null;
+            Log.d("GPS", locationGPS.toString());
             return locationGPS;
         } else {
-            Log.d("GPS",locationNet.toString());
+            assert locationNet != null;
+            Log.d("GPS", locationNet.toString());
             return locationNet;
         }
     }
