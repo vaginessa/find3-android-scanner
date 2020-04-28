@@ -1,5 +1,6 @@
 package com.internalpositioning.find3.find3app;
 
+import android.Manifest;
 import android.app.Service;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
@@ -7,11 +8,13 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationManager;
 import android.net.wifi.ScanResult;
 import android.net.wifi.WifiManager;
 import android.os.IBinder;
+import android.support.v4.app.ActivityCompat;
 import android.util.Log;
 
 import com.android.volley.NetworkResponse;
@@ -188,7 +191,6 @@ public class ScanService extends Service {
         }
         stopSelf();
         super.onDestroy();
-
     }
 
     private void doScan() {
@@ -296,10 +298,10 @@ public class ScanService extends Service {
         LocationManager mLocationManager = (LocationManager)
                 getSystemService(Context.LOCATION_SERVICE);
 
+        assert ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED || ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED;
         assert mLocationManager != null;
         Location locationGPS = mLocationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
         Location locationNet = mLocationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
-
 
         long GPSLocationTime = 0;
         if (null != locationGPS) {

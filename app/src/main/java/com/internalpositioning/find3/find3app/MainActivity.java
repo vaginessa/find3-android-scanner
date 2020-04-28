@@ -81,7 +81,6 @@ public class MainActivity extends AppCompatActivity {
         TextView rssi_msg = (TextView) findViewById(R.id.textOutput);
         rssi_msg.setText(R.string.not_running);
 
-
         // check to see if there are preferences
         SharedPreferences sharedPref = MainActivity.this.getPreferences(Context.MODE_PRIVATE);
         EditText familyNameEdit = (EditText) findViewById(R.id.familyName);
@@ -93,12 +92,10 @@ public class MainActivity extends AppCompatActivity {
         CheckBox checkBoxAllowGPS = (CheckBox) findViewById(R.id.allowGPS);
         checkBoxAllowGPS.setChecked(sharedPref.getBoolean("allowGPS", false));
 
-
         AutoCompleteTextView textView = (AutoCompleteTextView) findViewById(R.id.locationName);
         ArrayAdapter<String> adapter =
                 new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, autocompleteLocations);
         textView.setAdapter(adapter);
-
 
         ToggleButton toggleButtonTracking = (ToggleButton) findViewById(R.id.toggleScanType);
         toggleButtonTracking.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
@@ -210,7 +207,6 @@ public class MainActivity extends AppCompatActivity {
                             (android.app.NotificationManager) MainActivity.this.getSystemService(Context.NOTIFICATION_SERVICE);
                     assert notificationManager != null;
                     notificationManager.notify(0 /* ID of notification */, notificationBuilder.build());
-
 
                     final TextView myClickableUrl = (TextView) findViewById(R.id.textInstructions);
                     myClickableUrl.setText(String.format(Locale.getDefault(), "See your results in realtime: %s/view/location/%s/%s", serverAddress, familyName, deviceName));
@@ -378,6 +374,5 @@ public class MainActivity extends AppCompatActivity {
             });
         }
     }
-
 
 }

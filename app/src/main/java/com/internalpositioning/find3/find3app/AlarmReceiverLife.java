@@ -47,5 +47,4 @@ public class AlarmReceiverLife extends BroadcastReceiver {
         wakeLock.release();
     }
 
-
 }
