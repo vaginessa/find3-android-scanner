@@ -69,7 +69,6 @@ public class ScanService extends Service {
     private final BroadcastReceiver mWifiScanReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context c, Intent intent) {
-            // This condition is not necessary if you listen to only one action
             if (intent.getBooleanExtra(WifiManager.EXTRA_RESULTS_UPDATED, false)) {
                 Log.d(TAG, "timer off, trying to send data");
                 List<ScanResult> wifiScanList = wifi.getScanResults();
@@ -84,14 +83,15 @@ public class ScanService extends Service {
                     }
                 }
                 sendData();
-                BTAdapter.cancelDiscovery();
-                BTAdapter = BluetoothAdapter.getDefaultAdapter();
-                synchronized (lock) {
-                    isScanning = false;
-                }
-                if (!isLearningMode) {
-                    doScan(); // track as often as possible
-                }
+            }
+            // also when it fails we wanna continue
+            BTAdapter.cancelDiscovery();
+            BTAdapter = BluetoothAdapter.getDefaultAdapter();
+            synchronized (lock) {
+                isScanning = false;
+            }
+            if (!isLearningMode) {
+                doScan(); // track as often as possible
             }
         }
     };
@@ -168,7 +168,11 @@ public class ScanService extends Service {
                 }
             }, 0, 10000);//put here time 10000 milliseconds=10 second
         } else {
-            doScan();
+            synchronized (lock) {
+                if (!isScanning) {
+                    doScan();
+                }
+            }
         }
 
         return START_STICKY;
