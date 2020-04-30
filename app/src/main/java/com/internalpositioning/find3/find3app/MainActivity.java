@@ -9,9 +9,6 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.SystemClock;
-import android.support.v4.app.NotificationCompat;
-import android.support.v4.content.ContextCompat;
-import android.support.v7.app.AppCompatActivity;
 import android.text.util.Linkify;
 import android.util.Log;
 import android.widget.ArrayAdapter;
@@ -31,6 +28,10 @@ import java.net.URISyntaxException;
 import java.util.Locale;
 import java.util.Timer;
 import java.util.TimerTask;
+
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.NotificationCompat;
+import androidx.core.content.ContextCompat;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -78,30 +79,30 @@ public class MainActivity extends AppCompatActivity {
             requestPermissions(new String[]{Manifest.permission.WAKE_LOCK, Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.INTERNET, Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.BLUETOOTH, Manifest.permission.BLUETOOTH_ADMIN, Manifest.permission.CHANGE_WIFI_STATE, Manifest.permission.ACCESS_WIFI_STATE}, 1);
         }
 
-        TextView rssi_msg = (TextView) findViewById(R.id.textOutput);
+        TextView rssi_msg = findViewById(R.id.textOutput);
         rssi_msg.setText(R.string.not_running);
 
         // check to see if there are preferences
         SharedPreferences sharedPref = MainActivity.this.getPreferences(Context.MODE_PRIVATE);
-        EditText familyNameEdit = (EditText) findViewById(R.id.familyName);
+        EditText familyNameEdit = findViewById(R.id.familyName);
         familyNameEdit.setText(sharedPref.getString("familyName", ""));
-        EditText deviceNameEdit = (EditText) findViewById(R.id.deviceName);
+        EditText deviceNameEdit = findViewById(R.id.deviceName);
         deviceNameEdit.setText(sharedPref.getString("deviceName", ""));
-        EditText serverAddressEdit = (EditText) findViewById(R.id.serverAddress);
+        EditText serverAddressEdit = findViewById(R.id.serverAddress);
         serverAddressEdit.setText(sharedPref.getString("serverAddress", ((EditText) findViewById(R.id.serverAddress)).getText().toString()));
-        CheckBox checkBoxAllowGPS = (CheckBox) findViewById(R.id.allowGPS);
+        CheckBox checkBoxAllowGPS = findViewById(R.id.allowGPS);
         checkBoxAllowGPS.setChecked(sharedPref.getBoolean("allowGPS", false));
 
-        AutoCompleteTextView textView = (AutoCompleteTextView) findViewById(R.id.locationName);
+        AutoCompleteTextView textView = findViewById(R.id.locationName);
         ArrayAdapter<String> adapter =
                 new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, autocompleteLocations);
         textView.setAdapter(adapter);
 
-        ToggleButton toggleButtonTracking = (ToggleButton) findViewById(R.id.toggleScanType);
+        ToggleButton toggleButtonTracking = findViewById(R.id.toggleScanType);
         toggleButtonTracking.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                TextView rssi_msg = (TextView) findViewById(R.id.textOutput);
+                TextView rssi_msg = findViewById(R.id.textOutput);
                 rssi_msg.setText(R.string.not_running);
                 Log.d(TAG, "toggle set to false");
                 if (alarms != null) alarms.cancel(recurringLl24);
@@ -111,17 +112,17 @@ public class MainActivity extends AppCompatActivity {
                 if (timer != null) timer.cancel();
                 destroyScanService();
 
-                CompoundButton scanButton = (CompoundButton) findViewById(R.id.toggleButton);
+                CompoundButton scanButton = findViewById(R.id.toggleButton);
                 scanButton.setChecked(false);
             }
         });
 
-        ToggleButton toggleButton = (ToggleButton) findViewById(R.id.toggleButton);
+        ToggleButton toggleButton = findViewById(R.id.toggleButton);
         toggleButton.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if (isChecked) {
-                    TextView rssi_msg = (TextView) findViewById(R.id.textOutput);
+                    TextView rssi_msg = findViewById(R.id.textOutput);
                     String familyName = ((EditText) findViewById(R.id.familyName)).getText().toString().toLowerCase();
                     if (familyName.equals("")) {
                         rssi_msg.setText(R.string.no_family);
@@ -150,7 +151,7 @@ public class MainActivity extends AppCompatActivity {
                     Log.d(TAG, "allowGPS is checked: " + allowGPS);
                     String locationName = ((EditText) findViewById(R.id.locationName)).getText().toString().toLowerCase();
 
-                    CompoundButton trackingButton = (CompoundButton) findViewById(R.id.toggleScanType);
+                    CompoundButton trackingButton = findViewById(R.id.toggleScanType);
                     if (!trackingButton.isChecked()) {
                         locationName = "";
                     } else {
@@ -192,7 +193,7 @@ public class MainActivity extends AppCompatActivity {
                     if (!locationName.equals("")) {
                         scanningMessage += " at " + locationName;
                     }
-                    NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(MainActivity.this)
+                    NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(MainActivity.this, "FIND3")
                             .setSmallIcon(R.drawable.ic_stat_name)
                             .setContentTitle(scanningMessage)
                             .setContentIntent(recurringLl24);
@@ -208,11 +209,11 @@ public class MainActivity extends AppCompatActivity {
                     assert notificationManager != null;
                     notificationManager.notify(0 /* ID of notification */, notificationBuilder.build());
 
-                    final TextView myClickableUrl = (TextView) findViewById(R.id.textInstructions);
+                    final TextView myClickableUrl = findViewById(R.id.textInstructions);
                     myClickableUrl.setText(String.format(Locale.getDefault(), "See your results in realtime: %s/view/location/%s/%s", serverAddress, familyName, deviceName));
                     Linkify.addLinks(myClickableUrl, Linkify.WEB_URLS);
                 } else {
-                    TextView rssi_msg = (TextView) findViewById(R.id.textOutput);
+                    TextView rssi_msg = findViewById(R.id.textOutput);
                     rssi_msg.setText(R.string.not_running);
                     Log.d(TAG, "toggle set to false");
                     alarms.cancel(recurringLl24);
@@ -318,7 +319,7 @@ public class MainActivity extends AppCompatActivity {
                         if (!locationName.equals("")) {
                             message += " at " + locationName;
                         }
-                        TextView rssi_msg = (TextView) findViewById(R.id.textOutput);
+                        TextView rssi_msg = findViewById(R.id.textOutput);
                         Log.d("WebSocket", message);
                         rssi_msg.setText(message);
 
@@ -337,7 +338,7 @@ public class MainActivity extends AppCompatActivity {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        TextView rssi_msg = (TextView) findViewById(R.id.textOutput);
+                        TextView rssi_msg = findViewById(R.id.textOutput);
                         rssi_msg.setText(R.string.web_socket_error);
                     }
                 });
@@ -363,7 +364,7 @@ public class MainActivity extends AppCompatActivity {
                             connectWebSocket();
                         }
                     }
-                    TextView rssi_msg = (TextView) findViewById(R.id.textOutput);
+                    TextView rssi_msg = findViewById(R.id.textOutput);
                     String currentText = rssi_msg.getText().toString();
                     if (currentText.contains("ago: ")) {
                         String[] currentTexts = currentText.split("ago: ");

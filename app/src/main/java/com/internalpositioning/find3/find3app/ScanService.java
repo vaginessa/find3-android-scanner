@@ -14,7 +14,6 @@ import android.location.LocationManager;
 import android.net.wifi.ScanResult;
 import android.net.wifi.WifiManager;
 import android.os.IBinder;
-import android.support.v4.app.ActivityCompat;
 import android.util.Log;
 
 import com.android.volley.NetworkResponse;
@@ -31,8 +30,8 @@ import org.json.JSONObject;
 
 import java.nio.charset.StandardCharsets;
 import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
+
+import androidx.core.app.ActivityCompat;
 
 /**
  * Created by zacks on 3/2/2018.
@@ -43,9 +42,6 @@ public class ScanService extends Service {
     private final String TAG = "ScanService";
 
     boolean mAllowRebind; // indicates whether onRebind should be used
-
-    boolean isScanning = false;
-    private final Object lock = new Object();
 
     // wifi scanning
     private WifiManager wifi;
@@ -60,12 +56,14 @@ public class ScanService extends Service {
     private JSONObject bluetoothResults = new JSONObject();
     private JSONObject wifiResults = new JSONObject();
 
+    private int totalScans = 0;
+    private boolean isLearning = false;
+
     private String familyName = "";
     private String locationName = "";
     private String deviceName = "";
     private String serverAddress = "";
     private boolean allowGPS = false;
-    private boolean isLearningMode = false;
     private final BroadcastReceiver mWifiScanReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context c, Intent intent) {
@@ -83,16 +81,17 @@ public class ScanService extends Service {
                     }
                 }
                 sendData();
+
+                ++totalScans;
             }
             // also when it fails we wanna continue
             BTAdapter.cancelDiscovery();
             BTAdapter = BluetoothAdapter.getDefaultAdapter();
-            synchronized (lock) {
-                isScanning = false;
+
+            if (isLearning && totalScans >= 30) { // if we are learning and gathered already 30 data points in this round stop
+                return;
             }
-            if (!isLearningMode) {
-                doScan(); // track as often as possible
-            }
+            doScan(); // track as often as possible
         }
     };
 
@@ -153,27 +152,9 @@ public class ScanService extends Service {
 
         Log.d(TAG, "familyName: " + familyName);
 
-        isLearningMode = !locationName.isEmpty();
+        isLearning = !locationName.isEmpty();
 
-        if (isLearningMode) {
-            new Timer().scheduleAtFixedRate(new TimerTask() {
-                @Override
-                public void run() {
-                    //your method
-                    synchronized (lock) {
-                        if (!isScanning) {
-                            doScan();
-                        }
-                    }
-                }
-            }, 0, 10000);//put here time 10000 milliseconds=10 second
-        } else {
-            synchronized (lock) {
-                if (!isScanning) {
-                    doScan();
-                }
-            }
-        }
+        doScan();
 
         return START_STICKY;
     }
@@ -198,12 +179,6 @@ public class ScanService extends Service {
     }
 
     private void doScan() {
-        synchronized (lock) {
-            if (isScanning) {
-                return;
-            }
-            isScanning = true;
-        }
         bluetoothResults = new JSONObject();
         wifiResults = new JSONObject();
         BTAdapter.startDiscovery();
@@ -223,6 +198,7 @@ public class ScanService extends Service {
             if (BluetoothDevice.ACTION_FOUND.equals(action)) {
                 int rssi = intent.getShortExtra(BluetoothDevice.EXTRA_RSSI, Short.MIN_VALUE);
                 BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
+                assert device != null;
                 String name = device.getAddress().toLowerCase();
                 Log.v(TAG, "bluetooth: " + name + " => " + rssi + "dBm");
                 try {
@@ -275,7 +251,7 @@ public class ScanService extends Service {
 
                 @Override
                 public byte[] getBody() {
-                    return mRequestBody == null ? null : mRequestBody.getBytes(StandardCharsets.UTF_8);
+                    return mRequestBody.getBytes(StandardCharsets.UTF_8);
                 }
 
                 @Override

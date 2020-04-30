@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -48,7 +48,8 @@
                     android:gravity="center"
                     android:hint="@+id/familyLabel"
                     android:inputType="textPersonName"
-                    android:paddingTop="-10dp" />
+                    android:paddingTop="-10dp"
+                    android:autofillHints="" />
 
             </LinearLayout>
 
@@ -72,7 +73,8 @@
                     android:ems="10"
                     android:gravity="center"
                     android:hint="@+id/deviceLabel"
-                    android:inputType="textUri|textPersonName" />
+                    android:inputType="textUri|textPersonName"
+                    android:autofillHints="" />
 
             </LinearLayout>
 
@@ -98,7 +100,8 @@
                     android:hint="@+id/serverLabel"
                     android:inputType="textUri|textPersonName"
                     android:text="@string/default_server"
-                    android:textSize="12sp" />
+                    android:textSize="12sp"
+                    android:autofillHints="" />
 
             </LinearLayout>
 
@@ -203,4 +206,4 @@
 
     </ScrollView>
 
-</android.support.constraint.ConstraintLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>
