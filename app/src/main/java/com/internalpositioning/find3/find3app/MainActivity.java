@@ -46,6 +46,8 @@ public class MainActivity extends AppCompatActivity {
     Timer timer = null;
     private RemindTask oneSecondTimer = null;
 
+    private int receivedMessages = 0;
+
     @Override
     protected void onDestroy() {
         Log.d(TAG, "MainActivity onDestroy()");
@@ -95,15 +97,7 @@ public class MainActivity extends AppCompatActivity {
         toggleButtonTracking.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                TextView rssi_msg = findViewById(R.id.textOutput);
-                rssi_msg.setText(R.string.not_running);
-                Log.d(TAG, "toggle set to false");
-                if (alarms != null) alarms.cancel(recurringLl24);
-                android.app.NotificationManager mNotificationManager = (android.app.NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-                assert mNotificationManager != null;
-                mNotificationManager.cancel(0);
-                if (timer != null) timer.cancel();
-                destroyScanService();
+                cancel();
 
                 CompoundButton scanButton = findViewById(R.id.toggleButton);
                 scanButton.setChecked(false);
@@ -206,22 +200,26 @@ public class MainActivity extends AppCompatActivity {
                     myClickableUrl.setText(String.format(Locale.getDefault(), "See your results in realtime: %s/view/location/%s/%s", serverAddress, familyName, deviceName));
                     Linkify.addLinks(myClickableUrl, Linkify.WEB_URLS);
                 } else {
-                    TextView rssi_msg = findViewById(R.id.textOutput);
-                    rssi_msg.setText(R.string.not_running);
-                    Log.d(TAG, "toggle set to false");
-                    alarms.cancel(recurringLl24);
-                    android.app.NotificationManager mNotificationManager = (android.app.NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-                    assert mNotificationManager != null;
-                    mNotificationManager.cancel(0);
-                    timer.cancel();
-                    destroyScanService();
+                    cancel();
                 }
             }
         });
     }
 
+    private void cancel() {
+        TextView rssi_msg = findViewById(R.id.textOutput);
+        rssi_msg.setText(R.string.not_running);
+        Log.d(TAG, "toggle set to false");
+        if (alarms != null) alarms.cancel(recurringLl24);
+        android.app.NotificationManager mNotificationManager = (android.app.NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        assert mNotificationManager != null;
+        mNotificationManager.cancel(0);
+        if (timer != null) timer.cancel();
+        destroyScanService();
+        receivedMessages = 0;
+    }
+
     private void connectWebSocket() {
-        final int[] receivedMessages = {0};
         URI uri;
         try {
             String serverAddress = ((EditText) findViewById(R.id.serverAddress)).getText().toString();
@@ -309,13 +307,13 @@ public class MainActivity extends AppCompatActivity {
                             return;
                         }
 
-                        receivedMessages[0]++;
+                        receivedMessages++;
 
-                        String message = "1 second ago: added " + bluetoothPoints + " bluetooth and " + wifiPoints + " wifi points for " + familyName + "/" + deviceName + "\nData Points: " + receivedMessages[0];
+                        String message = "1 second ago: added " + bluetoothPoints + " bluetooth and " + wifiPoints + " wifi points for " + familyName + "/" + deviceName + "\nData Points: " + receivedMessages;
                         oneSecondTimer.resetCounter();
                         if (!locationName.equals("")) {
                             message += " at " + locationName;
-                            if (receivedMessages[0] >= 30) { // play sound during learning when 30 is reached
+                            if (receivedMessages >= 30) { // play sound during learning when 30 is reached
                                 playSound();
                             }
                         }
