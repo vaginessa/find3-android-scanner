@@ -171,6 +171,7 @@ public class MainActivity extends AppCompatActivity {
                     alarms = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
                     assert alarms != null;
                     alarms.set(AlarmManager.RTC_WAKEUP, SystemClock.currentThreadTimeMillis(), recurringLl24);
+                    receivedMessages = 0; // reset received messages
                     timer = new Timer();
                     oneSecondTimer = new RemindTask();
                     timer.scheduleAtFixedRate(oneSecondTimer, 1000, 1000);
@@ -216,7 +217,6 @@ public class MainActivity extends AppCompatActivity {
         mNotificationManager.cancel(0);
         if (timer != null) timer.cancel();
         destroyScanService();
-        receivedMessages = 0;
     }
 
     private void connectWebSocket() {
