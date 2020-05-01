@@ -7,12 +7,12 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.media.AudioManager;
+import android.media.ToneGenerator;
 import android.os.Bundle;
 import android.os.SystemClock;
 import android.text.util.Linkify;
 import android.util.Log;
-import android.widget.ArrayAdapter;
-import android.widget.AutoCompleteTextView;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
@@ -45,8 +45,6 @@ public class MainActivity extends AppCompatActivity {
     WebSocketClient mWebSocketClient = null;
     Timer timer = null;
     private RemindTask oneSecondTimer = null;
-
-    private String[] autocompleteLocations = new String[]{"bedroom", "living room", "kitchen", "bathroom", "office"};
 
     @Override
     protected void onDestroy() {
@@ -92,11 +90,6 @@ public class MainActivity extends AppCompatActivity {
         serverAddressEdit.setText(sharedPref.getString("serverAddress", ((EditText) findViewById(R.id.serverAddress)).getText().toString()));
         CheckBox checkBoxAllowGPS = findViewById(R.id.allowGPS);
         checkBoxAllowGPS.setChecked(sharedPref.getBoolean("allowGPS", false));
-
-        AutoCompleteTextView textView = findViewById(R.id.locationName);
-        ArrayAdapter<String> adapter =
-                new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, autocompleteLocations);
-        textView.setAdapter(adapter);
 
         ToggleButton toggleButtonTracking = findViewById(R.id.toggleScanType);
         toggleButtonTracking.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
@@ -228,6 +221,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void connectWebSocket() {
+        final int[] receivedMessages = {0};
         URI uri;
         try {
             String serverAddress = ((EditText) findViewById(R.id.serverAddress)).getText().toString();
@@ -314,17 +308,28 @@ public class MainActivity extends AppCompatActivity {
                         if ((System.currentTimeMillis() - secondsAgo) / 1000 > 3) {
                             return;
                         }
-                        String message = "1 second ago: added " + bluetoothPoints + " bluetooth and " + wifiPoints + " wifi points for " + familyName + "/" + deviceName;
+
+                        receivedMessages[0]++;
+
+                        String message = "1 second ago: added " + bluetoothPoints + " bluetooth and " + wifiPoints + " wifi points for " + familyName + "/" + deviceName + "\nData Points: " + receivedMessages[0];
                         oneSecondTimer.resetCounter();
                         if (!locationName.equals("")) {
                             message += " at " + locationName;
+                            if (receivedMessages[0] >= 30) { // play sound during learning when 30 is reached
+                                playSound();
+                            }
                         }
                         TextView rssi_msg = findViewById(R.id.textOutput);
                         Log.d("WebSocket", message);
                         rssi_msg.setText(message);
-
                     }
                 });
+            }
+
+            private void playSound() {
+                int durationInSeconds = 1;
+                ToneGenerator toneGenerator = new ToneGenerator(AudioManager.STREAM_ALARM, ToneGenerator.MAX_VOLUME);
+                toneGenerator.startTone(ToneGenerator.TONE_CDMA_ALERT_CALL_GUARD, durationInSeconds * 1000);
             }
 
             @Override
