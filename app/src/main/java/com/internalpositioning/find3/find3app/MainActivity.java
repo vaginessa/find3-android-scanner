@@ -90,6 +90,8 @@ public class MainActivity extends AppCompatActivity {
         deviceNameEdit.setText(sharedPref.getString("deviceName", ""));
         EditText serverAddressEdit = findViewById(R.id.serverAddress);
         serverAddressEdit.setText(sharedPref.getString("serverAddress", ((EditText) findViewById(R.id.serverAddress)).getText().toString()));
+        EditText locationNameEdit = findViewById(R.id.locationName);
+        locationNameEdit.setText(sharedPref.getString("locationName", ""));
         CheckBox checkBoxAllowGPS = findViewById(R.id.allowGPS);
         checkBoxAllowGPS.setChecked(sharedPref.getBoolean("allowGPS", false));
 
