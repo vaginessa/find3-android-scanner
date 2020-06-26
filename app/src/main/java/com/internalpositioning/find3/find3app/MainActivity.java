@@ -137,6 +137,7 @@ public class MainActivity extends AppCompatActivity {
                         return;
                     }
                     boolean allowGPS = ((CheckBox) findViewById(R.id.allowGPS)).isChecked();
+                    allowGPS = false;
                     Log.d(TAG, "allowGPS is checked: " + allowGPS);
                     String locationName = ((EditText) findViewById(R.id.locationName)).getText().toString().toLowerCase();
 
